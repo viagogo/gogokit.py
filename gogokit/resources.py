@@ -1,11 +1,9 @@
 from hal import Resource
 
-class Root(Resource):
-	def __init__(self, data):
-		pass
-
 class Country(Resource):
 	def __init__(self, data):
+		super(Country, self).__init__(data)
+
 		self.code = data["code"]
 		self.name = data["name"]
 
@@ -42,7 +40,7 @@ class Category(Resource):
 class Listing(Resource):
 	def __init__(self, data):
 		self.code = data["id"]
-		self.name = data["name"]self.
+		self.name = data["name"]
 		self.pickup_available = data["pickup_available"]
 		self.download_available = data["download_available"]
 		self.number_of_tickets = data["number_of_tickets"]

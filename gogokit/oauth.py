@@ -1,5 +1,6 @@
 import requests
 
+from http_client import HttpClient
 from requests.auth import HTTPBasicAuth
 from config import __token_url__
 
@@ -20,7 +21,7 @@ class OAuthTokenStore:
 class OAuthClient:
 	def __init__(self, client_id, client_secret):
 		self.client_id = client_id
-		self.client_secret = cleint_secret
+		self.client_secret = client_secret
 
 	def get_client_access_token(self, scopes):
 		data = {'grant_type': 'client_credentials', 'scope': scopes}
