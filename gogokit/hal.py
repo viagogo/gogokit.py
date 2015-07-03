@@ -1,6 +1,8 @@
-from oauth import OAuthClient
-from http_client import HttpClient, HTTPBearerAuth
-from config import __root_url__
+from .oauth import OAuthClient
+from .http_client import HttpClient, HTTPBearerAuth
+from .config import __root_url__
+
+import six
 
 class Link(object):
 	def __init__(self, data):		
@@ -11,11 +13,13 @@ class Link(object):
 class Resource(object):
 	def __init__(self, data):
 		self.links = {}
-		for rel, link in data["_links"].iteritems():			
-			self.links[rel] = Link(link)
+		if "_links" in data:
+			for rel, link in six.iteritems(data["_links"]):			
+				self.links[rel] = Link(link)
 
 class PagedResource(Resource):
 	def __init__(self, data, factory):
+		super(PagedResource, self).__init__(data)
 		self.items = []
 		for item in data["_embedded"]["items"]:
 			self.items.append(factory(item))
@@ -28,10 +32,8 @@ class Root(Resource):
 	def __init__(self, data):
 		super(Root, self).__init__(data)
 		self.__links_dict = {}
-		for rel, link in data["_links"].iteritems():			
+		for rel, link in six.iteritems(data["_links"]):			
 			self.__links_dict[rel] = Link(link)
-
-		self.self_link = Link(data["_links"]["self"])
 
 	def get_link(self, rel):
 		return self.__links_dict[rel]

@@ -18,7 +18,7 @@ setup(
   license=open('LICENSE.txt').read(),
   description='GogoKit is a lightweight, viagogo API client library for Python.',
   long_description=open('README.md').read(),
-  install_requires=['requests>=2.7.0', 'six>=1.9.0', 'nose>=1.3.0', 'uritemplate>=0.6'],
+  install_requires=['requests>=2.7.0', 'uritemplate>=0.6', 'iso8601>=0.1.10', 'six>=1.9.0'],
   classifiers=[
     'Intended Audience :: Developers',
     'Natural Language :: English',

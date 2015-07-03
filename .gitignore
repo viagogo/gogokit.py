@@ -1,3 +1,5 @@
 *.pyc
 build/
 dist/
+gogokit.egg-info/
+*.pypirc

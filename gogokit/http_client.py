@@ -1,13 +1,15 @@
 import requests
 import json
-from exceptions import HttpError 
+from .exceptions import HttpError 
+
+# from pprint import pprint
 
 class HTTPBearerAuth(requests.auth.AuthBase):
      def __init__(self, token):
      	self.token = token
 
      def __call__(self, request):
-     	request.headers["Authorization"] = "Bearer " + self.token.access_token
+        request.headers["Authorization"] = "Bearer " + self.token.access_token
         return request
 
 class HttpClient:

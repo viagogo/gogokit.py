@@ -1,8 +1,8 @@
 import requests
 
-from http_client import HttpClient
+from .http_client import HttpClient
 from requests.auth import HTTPBasicAuth
-from config import __token_url__
+from .config import __token_url__
 
 class OAuthToken(object):
 	def __init__(self, data):

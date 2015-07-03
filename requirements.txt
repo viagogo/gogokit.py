@@ -1,0 +1,4 @@
+requests>=2.7.0
+uritemplate>=0.6
+iso8601>=0.1.10
+six>=1.9.0
