@@ -23,7 +23,7 @@ class OAuthClient:
 		self.client_id = client_id
 		self.client_secret = client_secret
 
-	def get_client_access_token(self, scopes):
+	def get_client_access_token(self, scopes = None):
 		data = {'grant_type': 'client_credentials', 'scope': scopes}
 		return OAuthToken(HttpClient.post(__token_url__, data = data, auth=HTTPBasicAuth(self.client_id, self.client_secret)))
 
