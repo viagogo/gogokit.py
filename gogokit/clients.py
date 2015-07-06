@@ -1,31 +1,31 @@
-from .oauth import OAuthClient, OAuthTokenStore
+from .oauth import OAuthClient, OAuthTokenStore, OAuthToken
 from .hal import HalClient
 from .resources import *
 
 class BaseClient(object):
-	def __init__(self, hal_client, factory):
-		self.hal_client = hal_client
+	def __init__(self, hal, factory):
+		self.hal = hal
 		self.__factory = factory
 
 	def get_resource(self, linkRel, linkParams, params = None):
-		root = self.hal_client.get_root()
+		root = self.hal.get_root()
 		url = root.get_link(linkRel).href + '/' + str(linkParams)
 		
-		return self.hal_client.get_resource(url, self.__factory, params)
+		return self.hal.get_resource(url, self.__factory, params)
 
 	def get_resources(self, linkRel, linkParams, params = None):
-		root = self.hal_client.get_root()
+		root = self.hal.get_root()
 		linkParams = '/' + str(linkParams) if linkParams is not None else ''
 		url = root.get_link(linkRel).href + linkParams
 		
-		return self.hal_client.get_paged_resource(url, self.__factory, params)
+		return self.hal.get_paged_resource(url, self.__factory, params)
 
 	def get_all_resources(self, linkRel, linkParams, params = None):
 		params = {} if params is None else params
 		params['page'] = 1
 		params['page_size'] = 1000
 
-		root = self.hal_client.get_root()
+		root = self.hal.get_root()
 		linkParams = '/' + str(linkParams) if linkParams is not None else ''
 		url = root.get_link(linkRel).href + linkParams
 
@@ -33,7 +33,7 @@ class BaseClient(object):
 		hasNextPage = True
 
 		while hasNextPage:
-			page = self.hal_client.get_paged_resource(url, self.__factory, params)
+			page = self.hal.get_paged_resource(url, self.__factory, params)
 
 			if page.items:
 				for item in page.items:
@@ -51,8 +51,8 @@ class BaseClient(object):
 class CountryClient(BaseClient):
 	REL = 'viagogo:countries'
 
-	def __init__(self, hal_client):
-		super(CountryClient, self).__init__(hal_client, lambda data: Country(data))
+	def __init__(self, hal):
+		super(CountryClient, self).__init__(hal, lambda data: Country(data))
 
 	def get_country(self, countryCode, params = None):
 		return self.get_resource(self.REL, countryCode, params)
@@ -66,8 +66,8 @@ class CountryClient(BaseClient):
 class CurrencyClient(BaseClient):
 	REL = 'viagogo:currencies'
 
-	def __init__(self, hal_client):
-		super(CurrencyClient, self).__init__(hal_client, lambda data: Currency(data))
+	def __init__(self, hal):
+		super(CurrencyClient, self).__init__(hal, lambda data: Currency(data))
 
 	def get_currency(self, currencyCode, params = None):
 		return self.get_resource(self.REL, currencyCode, params)
@@ -81,8 +81,8 @@ class CurrencyClient(BaseClient):
 class LanguageClient(BaseClient):
 	REL = 'viagogo:languages'
 
-	def __init__(self, hal_client):
-		super(LanguageClient, self).__init__(hal_client, lambda data: Language(data))
+	def __init__(self, hal):
+		super(LanguageClient, self).__init__(hal, lambda data: Language(data))
 	
 	def get_language(self, languageCode, params = None):
 		return self.get_resource(self.REL, languageCode, params)
@@ -96,8 +96,8 @@ class LanguageClient(BaseClient):
 class VenueClient(BaseClient):
 	REL = 'viagogo:venues'
 
-	def __init__(self, hal_client):
-		super(VenueClient, self).__init__(hal_client, lambda data: Venue(data))
+	def __init__(self, hal):
+		super(VenueClient, self).__init__(hal, lambda data: Venue(data))
 
 	def get_venue(self, venueId, params = None):
 		return self.get_resource(self.REL, venueId, params)
@@ -111,8 +111,8 @@ class VenueClient(BaseClient):
 class MetroAreaClient(BaseClient):
 	REL = 'viagogo:metroareas'
 
-	def __init__(self, hal_client):
-		super(MetroAreaClient, self).__init__(hal_client, lambda data: MetroArea(data))
+	def __init__(self, hal):
+		super(MetroAreaClient, self).__init__(hal, lambda data: MetroArea(data))
 
 	def get_metro_area(self, metroAreaCode, params = None):
 		return self.get_resource(self.REL, metroAreaCode, params)
@@ -126,8 +126,8 @@ class MetroAreaClient(BaseClient):
 class CategoryClient(BaseClient):
 	REL = 'viagogo:genres'
 
-	def __init__(self, hal_client):
-		super(CategoryClient, self).__init__(hal_client, lambda data: Category(data))
+	def __init__(self, hal):
+		super(CategoryClient, self).__init__(hal, lambda data: Category(data))
 
 	def get_category(self, categoryId, params = None):
 		return self.get_resource('self', 'categories/' + str(categoryId), params)
@@ -136,8 +136,8 @@ class CategoryClient(BaseClient):
 		return self.get_resources(self.REL, None, params)
 
 class EventClient(BaseClient):
-	def __init__(self, hal_client):
-		super(EventClient, self).__init__(hal_client, lambda data: Event(data))
+	def __init__(self, hal):
+		super(EventClient, self).__init__(hal, lambda data: Event(data))
 
 	def get_event(self, eventId, params = None):
 		return self.get_resource('self', 'events/' + str(eventId), params)
@@ -149,8 +149,8 @@ class EventClient(BaseClient):
 		return self.get_all_resources('self', 'categories/' + str(categoryId) + '/events/', params)
 
 class ListingClient(BaseClient):
-	def __init__(self, hal_client):
-		super(ListingClient, self).__init__(hal_client, lambda data: Listing(data))
+	def __init__(self, hal):
+		super(ListingClient, self).__init__(hal, lambda data: Listing(data))
 
 	def get_listing(self, eventId, params = None):
 		return self.get_resource('self', 'listings/' + str(eventId), params)
@@ -164,8 +164,8 @@ class ListingClient(BaseClient):
 class SearchClient(BaseClient):
 	REL = 'viagogo:search'
 
-	def __init__(self, hal_client):
-		super(SearchClient, self).__init__(hal_client, lambda data: Search(data))
+	def __init__(self, hal):
+		super(SearchClient, self).__init__(hal, lambda data: Search(data))
 
 	def get_search_results(self, params):
 		return self.get_resources(self.REL, None, params)
@@ -178,17 +178,19 @@ class ViagogoClient:
 		self.__client_id = client_id
 		self.__client_secret = client_secret
 		self.__oauth_token_store = OAuthTokenStore() if oauth_token_store is None else oauth_token_store
-		self.oauth_client = OAuthClient(client_id, client_secret)
-		self.hal_client = HalClient(self.__oauth_token_store)
-		self.event_client = EventClient(self.hal_client)
-		self.listing_client = ListingClient(self.hal_client)
-		self.category_client = CategoryClient(self.hal_client)
-		self.search_client = SearchClient(self.hal_client)
-		self.country_client = CountryClient(self.hal_client)
-		self.currency_client = CurrencyClient(self.hal_client)
-		self.language_client = LanguageClient(self.hal_client)
-		self.venue_client = VenueClient(self.hal_client)
-		self.metro_area_client = MetroAreaClient(self.hal_client)
+		self.oauth = OAuthClient(client_id, client_secret)
+		self.hal = HalClient(self.__oauth_token_store)
+		self.event = EventClient(self.hal)
+		self.listing = ListingClient(self.hal)
+		self.category = CategoryClient(self.hal)
+		self.search = SearchClient(self.hal)
+		self.country = CountryClient(self.hal)
+		self.currency = CurrencyClient(self.hal)
+		self.language = LanguageClient(self.hal)
+		self.venue = VenueClient(self.hal)
+		self.metro_area = MetroAreaClient(self.hal)
 
 	def set_token(self, token):
+		if token is None or isinstance(token, OAuthToken) == False:
+			raise ValueError("You must provide an oauth token")
 		return self.__oauth_token_store.set_token(token)

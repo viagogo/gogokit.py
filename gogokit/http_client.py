@@ -2,7 +2,7 @@ import requests
 import json
 from .exceptions import HttpError 
 
-# from pprint import pprint
+from pprint import pprint
 
 class HTTPBearerAuth(requests.auth.AuthBase):
      def __init__(self, token):
@@ -40,5 +40,5 @@ class HttpClient:
 	@staticmethod
 	def __validate_response(response):
 			if response.status_code >= 400:
-				error = json.loads(response.text) if response.text is not None else {}
+				error = json.loads(response.text) if response.text else {}
 				raise HttpError({"status_code": response.status_code, "reason": response.reason, "error": error})

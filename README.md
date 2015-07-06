@@ -35,16 +35,16 @@ client = ViagogoClient(YOUR_CLIENT_ID, YOUR_CLIENT_SECRET)
 
 
 # Get an access token. See http://developer.viagogo.net/#getting-access-tokens
-token = client.oauth_client.get_client_access_token()
-client.set_token()
+token = client.oauth.get_client_access_token()
+client.set_token(token)
 
 
 # Get a list of events, categories, venues and metro areas that match the given
 # search query
-search = client.search_client.get_search_results({ "query": "Real Madrid" })
+search = client.search.get_search_results({ "query": "Real Madrid" })
 
 # Get the different event genres (see http://developer.viagogo.net/#entities)
-genres = client.category_client.get_genres()
+genres = client.category.get_genres()
 ```
 
 

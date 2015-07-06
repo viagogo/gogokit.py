@@ -1,4 +1,4 @@
-from .oauth import OAuthClient
+from .oauth import OAuthClient, OAuthTokenStore
 from .http_client import HttpClient, HTTPBearerAuth
 from .config import __root_url__
 
@@ -41,8 +41,8 @@ class Root(Resource):
 
 class HalClient:
 	def __init__(self, token_store):
-		if token_store is None:
-			raise ValueError("You must provide a token store")
+		if token_store is None or isinstance(token_store, OAuthTokenStore) == False:
+			raise ValueError("You must provide an oauth token store")
 		self.token_store = token_store
 
 	def get_root(self, params = None):
