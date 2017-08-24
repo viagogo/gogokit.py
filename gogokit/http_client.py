@@ -20,25 +20,37 @@ class HttpClient:
 		return json.loads(response.text)
 
 	@staticmethod
-	def post(url, auth, data = None, params = None, headers = None):
-		response = requests.post(url, data, params = params, headers = headers, auth=auth)
+	def post(url, data, auth , params = None, headers = None):
+		response = requests.post(url, json=data, params = params, headers = headers, auth=auth)
 		HttpClient.__validate_response(response)
 		return json.loads(response.text)
 
 	@staticmethod
-	def put(url, auth, data = None, params = None, headers = None):
-		response = requests.put(url, data, params = params, headers = headers, auth=auth)
+	def put(url, data, auth, params = None, headers = None):
+		response = requests.put(url, json=data, params = params, headers = headers, auth=auth)
 		HttpClient.__validate_response(response)
 		return json.loads(response.text)
 
 	@staticmethod
-	def patch(url, auth, data = None, params = None, headers = None):
-		response = requests.patch(url, data, params = params, headers = headers, auth=auth)
+	def patch(url, data, auth, params = None, headers = None):
+		response = requests.patch(url, json=data, params = params, headers = headers, auth=auth)
 		HttpClient.__validate_response(response)
 		return json.loads(response.text)
+
+	@staticmethod
+	def delete(url, auth, params = None, headers = None):		
+		response = requests.delete(url, data = None, params = params, headers = headers, auth=auth)
+		HttpClient.__validate_response(response)
 
 	@staticmethod
 	def __validate_response(response):
+			error = None
 			if response.status_code >= 400:
-				error = json.loads(response.text) if response.text else {}
+				try:
+					error = json.loads(response.text)
+				except Exception as e:
+					pass
+			
 				raise HttpError({"status_code": response.status_code, "reason": response.reason, "error": error})
+
+				  
