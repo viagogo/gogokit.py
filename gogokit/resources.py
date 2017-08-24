@@ -80,6 +80,29 @@ class Listing(Resource):
 		self.estimated_vat = MoneyFactory.create(data.get("estimated_vat", None))
 		self.estimated_total_charge = MoneyFactory.create(data.get("estimated_total_charge", None))
 
+class SellerListing(Resource):
+	def __init__(self, data):
+		super(SellerListing, self).__init__(data)
+		self.id = data.get("id", None)
+		self.created_at = iso8601.parse_date(data["created_at"])
+		self.updated_at = iso8601.parse_date(data["updated_at"])
+		self.external_id = data.get("external_id", None)
+		self.expires_at = iso8601.parse_date(data["expires_at"]) if data.get("expires_at", None) is not None else None
+		self.in_hand_at = iso8601.parse_date(data["in_hand_at"]) if data.get("in_hand_at", None) is not None else None
+		self.number_of_tickets = data.get("number_of_tickets", None)
+		self.display_number_of_tickets = data.get("display_number_of_tickets", None)
+		self.seating = data.get("seating", None)
+		self.display_seating = data.get("display_seating", None)
+		self.ticket_price = MoneyFactory.create(data.get("ticket_price", None))
+		self.ticket_proceeds = MoneyFactory.create(data.get("ticket_proceeds", None))
+		self.face_value = MoneyFactory.create(data.get("face_value", None))
+		self.instant_delivery = data.get("instant_delivery", None)
+		if "_embedded" in data:
+			self.event = data["_embedded"].get("event", None)
+			self.split_type = data["_embedded"].get("split_type", None)
+			self.ticket_type = data["_embedded"].get("ticket_type", None)
+			self.venue = data["_embedded"].get("venue", None)
+
 class Money(object):
 	def __init__(self, data):
 		self.amount = data.get("amount", None)

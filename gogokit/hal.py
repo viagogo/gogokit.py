@@ -1,6 +1,6 @@
 from .oauth import OAuthClient, OAuthTokenStore
 from .http_client import HttpClient, HTTPBearerAuth
-from .config import __root_url__
+from .config import __enpoint_map__
 
 import six
 
@@ -40,16 +40,32 @@ class Root(Resource):
 
 
 class HalClient:
-	def __init__(self, token_store):
+	def __init__(self, token_store, env):
 		if token_store is None or isinstance(token_store, OAuthTokenStore) == False:
 			raise ValueError("You must provide an oauth token store")
 		self.token_store = token_store
+		self.root_url = __enpoint_map__.get(env)
 
 	def get_root(self, params = None):
-		return Root(HttpClient.get(__root_url__, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params))
+		return Root(HttpClient.get(self.root_url, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params))
+
+	def get_root_url(self, params = None):
+		return self.root_url
 
 	def get_resource(self, url, factory, params = None):
 		return factory(HttpClient.get(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params))
+
+	def post(self, url, data,  factory, params = None):
+		return factory(HttpClient.post(url, data, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params))
+
+	def patch(self, url, data,  factory, params = None):
+		return factory(HttpClient.patch(url, data, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params))
+
+	def put(self, url, data, factory, params = None):
+		return factory(HttpClient.put(url, data, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params))
+
+	def delete(self, url, factory, params = None):
+		HttpClient.delete(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params)
 
 	def get_paged_resource(self, url, factory, params = None):
 		return PagedResource(HttpClient.get(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params), factory)
