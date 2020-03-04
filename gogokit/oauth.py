@@ -35,3 +35,8 @@ class OAuthClient:
 	def get_refresh_token(self, refresh_token):
 		data = {'grant_type': 'refresh_token','refresh_token': refresh_token};
 		return OAuthToken(HttpClient.post(self.token_url, data = data, auth=HTTPBasicAuth(self.client_id, self.client_secret)))
+			
+	def set_access_token(self, access_token):
+		token = {'access_token': access_token} 
+		return OAuthToken(token)
+

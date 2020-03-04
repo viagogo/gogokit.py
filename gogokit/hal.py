@@ -69,3 +69,9 @@ class HalClient:
 
 	def get_paged_resource(self, url, factory, params = None):
 		return PagedResource(HttpClient.get(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params), factory)
+
+	def get_file(self, url, params = None):
+		return HttpClient.get_file(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params)
+        
+	def post_file(self, url, file_name, file,  factory, params = None):
+		return PagedResource(HttpClient.post_file(url, file_name, file, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params), factory)

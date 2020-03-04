@@ -103,6 +103,14 @@ class SellerListing(Resource):
 			self.ticket_type = data["_embedded"].get("ticket_type", None)
 			self.venue = data["_embedded"].get("venue", None)
 
+class Webhook(Resource):
+	def __init__(self, data):
+		super(Webhook, self).__init__(data)
+		self.id = data.get("id", None)
+		self.name = data.get("name", None)
+		self.topics = data.get("topics", None)
+		self.created_at = iso8601.parse_date(data["created_at"])
+
 class Money(object):
 	def __init__(self, data):
 		self.amount = data.get("amount", None)
@@ -115,6 +123,63 @@ class Seating(object):
 		self.seat_from = data.get("seat_from", None)
 		self.row = data.get("row", None)
 		self.section = data.get("section", None)
+
+class Sale(Resource):
+	def __init__(self, data):
+		super(Sale, self).__init__(data)
+		self.id = data.get("id", None)
+		self.created_at = iso8601.parse_date(data["created_at"])
+		self.status = data.get("status", None)
+		self.status_description = data.get("status_description", None)
+		self.number_of_tickets = data.get("number_of_tickets", None)
+		self.seating = data.get("seating", None)
+		self.proceeds = MoneyFactory.create(data.get("proceeds", None))
+		self.confirm_by = iso8601.parse_date(data["confirm_by"]) if data.get("confirm_by", None) is not None else None
+		self.ship_by = iso8601.parse_date(data["ship_by"]) if data.get("ship_by", None) is not None else None
+		self.payment_type = data.get("payment_type", None)
+		self.payment_type_description = data.get("payment_type_description", None)
+		self.extpayment_detailsrnal_id = data.get("payment_details", None)
+	
+		if "_embedded" in data:
+			self.event = data["_embedded"].get("event", None)
+			self.delivery_method = data["_embedded"].get("delivery_method", None)
+			self.ticket_type = data["_embedded"].get("ticket_type", None)
+			self.venue = data["_embedded"].get("venue", None)
+
+class TicketHolderDetail(Resource):
+	def __init__(self, data):
+		super(TicketHolderDetail, self).__init__(data)
+		self.name = data.get("full_name", None)
+		self.email_address = data.get("email_address", None)
+
+class ETicketUpload(Resource):
+	def __init__(self, data):
+		super(ETicketUpload, self).__init__(data)
+		self.file_name = data.get("file_name", None)
+		self.id = data.get("id", None)
+		self.status_description = data.get("status_description", None)
+		self.processed_at = iso8601.parse_date(data["processed_at"])
+		self.original_number_of_tickets = data.get("original_number_of_tickets", None)
+			
+		if "_embedded" in data:
+			self.etickets = list(map(lambda eticket: ETicket(eticket), data["_embedded"].get("etickets", None)))
+
+class ETicket(Resource):
+	def __init__(self, data):
+		super(ETicket, self).__init__(data)
+		self.file_name = data.get("file_name", None)
+		self.id = data.get("id", None)
+		if "_links" in data:
+			self.delete_url = data["_links"].get("eticket:delete", None).get("href")
+			self.document_url = data["_links"].get("eticket:document", None).get("href")
+
+class Shipment(Resource):
+	def __init__(self, data):
+		super(Shipment, self).__init__(data)
+		self.tracking_number = data.get("tracking_number", None)
+		self.id = data.get("id", None)
+		if "_links" in data:
+			self.label_url = data["_links"].get("shipment:label", None).get("href")
 
 
 class MoneyFactory:
