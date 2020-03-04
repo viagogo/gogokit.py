@@ -10,7 +10,7 @@ class BaseClient(object):
 
 	def __get_url(self, path, id):
 		rootUrl = self.hal.get_root_url()
-		template = URITemplate(rootUrl + path);
+		template = URITemplate(rootUrl + path)
 
 		return template.expand(id= str(id) if id is not None else "")
 
@@ -26,18 +26,25 @@ class BaseClient(object):
 
 	def update(self, path, id, data, params = None):
 		url = self.__get_url(path, id)
-		
 		return self.hal.patch(url, data, self.__factory, params)
+
+	def upsert(self, path, id, data, params = None):
+		url = self.__get_url(path, id)
+		return self.hal.put(url, data, self.__factory, params)
 
 	def delete(self, path, id, params = None):
 		url = self.__get_url(path, id)
-		
+
 		return self.hal.delete(url, self.__factory, params)
 
 	def get_resources(self, path, id, params = None):
 		url = self.__get_url(path, id)
 		
 		return self.hal.get_paged_resource(url, self.__factory, params)
+	
+	def post_file(self, path, id, file_name, file, params = None):
+		url = self.__get_url(path, id)
+		return self.hal.post_file(url, file_name, file, self.__factory, params)
 
 	def get_all_resources(self, path, id, params = None):
 		params = {} if params is None else params
@@ -87,11 +94,11 @@ class SellerListingClient(BaseClient):
 	def delete_listing(self, listingId, params = None):
 		return self.delete(self.PATH, listingId, params)
 
-	def get_listing_by_external_id(self, externalListingId, data, params = None):
+	def get_listing_by_external_id(self, externalListingId, params = None):
 		return self.get_resource(self.EXTERNALPATH, externalListingId, params)
 
 	def update_listing_by_external_id(self, externalListingId, data, params = None):
-		return self.update(self.EXTERNALPATH, externalListingId, params)
+		return self.update(self.EXTERNALPATH, externalListingId, data, params)
 
 	def delete_listing_by_external_id(self, externalListingId, params = None):
 		return self.delete(self.EXTERNALPATH, externalListingId, params)
@@ -238,8 +245,88 @@ class ViagogoClient:
 		self.language = LanguageClient(self.hal)
 		self.venue = VenueClient(self.hal)
 		self.metro_area = MetroAreaClient(self.hal)
+		self.webhook = WebhookClient(self.hal)
+		self.sale = SaleClient(self.hal)
+		self.shipment = ShipmentClient(self.hal)
+		self.ticketholder = TicketHolderClient(self.hal)
+		self.eticket = ETicketClient(self.hal)
 
 	def set_token(self, token):
 		if token is None or isinstance(token, OAuthToken) == False:
 			raise ValueError("You must provide an oauth token")
 		return self.__oauth_token_store.set_token(token)
+
+
+class WebhookClient(BaseClient):
+	PATH = 'webhooks{/id}'
+	def __init__(self, hal):
+		super(WebhookClient, self).__init__(hal, lambda data: Webhook(data))
+
+	def create_webhook(self, data, params = None):
+		return self.create(self.PATH, data, params)
+
+	def delete_webhook(self, webhookId, params = None):
+		return self.delete(self.PATH, webhookId, params)
+
+	def get_all_webhooks(self, params = None):
+		return self.get_all_resources(self.PATH, params)
+
+
+class SaleClient(BaseClient):
+	PATH = 'sales{/id}'
+	def __init__(self, hal):
+		super(SaleClient, self).__init__(hal, lambda data: Sale(data))
+
+	def get_all_sales(self,params = None):
+		return self.get_all_resources(self.PATH, None, params)
+
+	def get_sale(self, sale_id, params = None):
+		return self.get_resource(self.PATH, sale_id, params)
+	
+	def confirm_sale(self, sale_id, params = None):
+		return self.update(self.PATH, sale_id, {'confirmed':'true' }, params)
+	
+	def reject_sale(self, sale_id,  params = None):
+		return self.update(self.PATH, sale_id, {'confirmed':'false' }, params)
+
+	def change_ticket_type(self, sale_id, ticket_type, params = None):
+		return self.update(self.PATH, sale_id, {'eticket_type': ticket_type}, params)
+
+	def upload_eticket_urls(self, sale_id, eticket_urls, params = None):
+		return self.update(self.PATH, sale_id, {'eticket_urls': eticket_urls}, params)
+
+	def upload_transfer_confirmation(self, sale_id, transfer_confirmation_number, params = None):
+		return self.update(self.PATH, sale_id, {'transfer_confirmation_number': transfer_confirmation_number}, params)
+
+	def save_eticket_ids(self, sale_id, eticket_ids, params = None):
+		return self.update(self.PATH, sale_id, {'eticket_ids': eticket_ids}, params)
+
+class ShipmentClient(BaseClient):
+	PATH = 'sales{/id}/shipments'
+	def __init__(self, hal):
+		super(ShipmentClient, self).__init__(hal, lambda data: Shipment(data))
+
+	def get_shipment_label(self, url, params = None):
+		return self.hal.get_file(url, params=params)
+		
+	def create_shipment(self, sale_id, params=None):
+		return  self.upsert(self.PATH, sale_id, params)
+
+class ETicketClient(BaseClient):
+	PATH = 'sales{/id}/eticketuploads'
+	def __init__(self, hal):
+		super(ETicketClient, self).__init__(hal, lambda data: ETicketUpload(data))
+
+	def upload_eticket(self, sale_id, file_name, file, params = None):
+		return self.post_file(self.PATH, sale_id, file_name, file, params)
+		
+	def get_uploads(self, sale_id, params=None):
+		return self.get_resources(self.PATH, sale_id, params)
+		
+class TicketHolderClient(BaseClient):
+	PATH = 'sales{/id}/ticketholders'
+	def __init__(self, hal):
+		super(TicketHolderClient, self).__init__(hal, lambda data: TicketHolderDetail(data))
+
+	def get_ticket_holder_details(self, sale_id, params = None):
+		return self.get_all_resources(self.PATH, sale_id, params)
