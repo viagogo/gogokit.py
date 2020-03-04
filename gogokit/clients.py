@@ -28,7 +28,7 @@ class BaseClient(object):
 		url = self.__get_url(path, id)
 		return self.hal.patch(url, data, self.__factory, params)
 
-	def replace(self, path, id, data, params = None):
+	def upsert(self, path, id, data, params = None):
 		url = self.__get_url(path, id)
 		return self.hal.put(url, data, self.__factory, params)
 
@@ -289,7 +289,7 @@ class SaleClient(BaseClient):
 	def reject_sale(self, sale_id,  params = None):
 		return self.update(self.PATH, sale_id, {'confirmed':'false' }, params)
 
-	def change_ticket_types(self, sale_id, ticket_type, params = None):
+	def change_ticket_type(self, sale_id, ticket_type, params = None):
 		return self.update(self.PATH, sale_id, {'eticket_type': ticket_type}, params)
 
 	def upload_eticket_urls(self, sale_id, eticket_urls, params = None):
@@ -310,7 +310,7 @@ class ShipmentClient(BaseClient):
 		return self.hal.get_file(url, params=params)
 		
 	def create_shipment(self, sale_id, params=None):
-		return  self.replace(self.PATH, sale_id, params)
+		return  self.upsert(self.PATH, sale_id, params)
 
 class ETicketClient(BaseClient):
 	PATH = 'sales{/id}/eticketuploads'
