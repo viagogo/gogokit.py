@@ -1,5 +1,5 @@
 __pypi_packagename__ = "gogokit"
-__version__ = "0.1.5"
+__version__ = "0.2.0"
 __auth_endpoint_map__ = {
 	"production":"https://account.viagogo.com/oauth2/token",
 	"sandbox": "https://sandbox.account.viagogo.com/oauth2/token"
