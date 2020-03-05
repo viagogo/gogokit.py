@@ -29,11 +29,11 @@ class OAuthClient:
 		return OAuthToken(HttpClient.post(self.token_url, data = data, auth=HTTPBasicAuth(self.client_id, self.client_secret)))
 
 	def get_password_access_token(self, login, password, scopes):
-		data = {'grant_type': 'password','username':login, 'password':password, 'scope': scopes};
+		data = {'grant_type': 'password','username':login, 'password':password, 'scope': scopes}
 		return OAuthToken(HttpClient.post(self.token_url, data = data, auth=HTTPBasicAuth(self.client_id, self.client_secret)))
 
 	def get_refresh_token(self, refresh_token):
-		data = {'grant_type': 'refresh_token','refresh_token': refresh_token};
+		data = {'grant_type': 'refresh_token','refresh_token': refresh_token}
 		return OAuthToken(HttpClient.post(self.token_url, data = data, auth=HTTPBasicAuth(self.client_id, self.client_secret)))
 			
 	def set_access_token(self, access_token):
