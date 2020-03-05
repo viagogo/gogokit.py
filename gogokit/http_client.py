@@ -15,26 +15,26 @@ class HTTPBearerAuth(requests.auth.AuthBase):
 
 class HttpClient:
 	@staticmethod
-	def get(url, auth, data = None, params = None, headers = None):
-		response = requests.get(url, data = data, params = params, headers = headers, auth=auth)
+	def get(url, auth, data = None, json_data = None, params = None, headers = None):
+		response = requests.get(url, data = data, json=json_data, params = params, headers = headers, auth=auth)
 		HttpClient.__validate_response(response)
 		return json.loads(response.text)
 
 	@staticmethod
-	def post(url, data, auth , params = None, headers = None):
-		response = requests.post(url, json=data, params = params, headers = headers, auth=auth)
+	def post(url, auth, data = None, json_data = None, params = None, headers = None):
+		response = requests.post(url, data=data, json=json_data, params = params, headers = headers, auth=auth)
 		HttpClient.__validate_response(response)
 		return json.loads(response.text)
 
 	@staticmethod
-	def put(url, data, auth, params = None, headers = None):
-		response = requests.put(url, json=data, params = params, headers = headers, auth=auth)
+	def put(url, auth, data = None, json_data = None, params = None, headers = None):
+		response = requests.put(url, data=data, json=json_data, params = params, headers = headers, auth=auth)
 		HttpClient.__validate_response(response)
 		return json.loads(response.text)
 
 	@staticmethod
-	def patch(url, data, auth, params = None, headers = None):
-		response = requests.patch(url, json=data, params = params, headers = headers, auth=auth)
+	def patch(url, auth, data = None, json_data = None, params = None, headers = None):
+		response = requests.patch(url, data=data, json=json_data, params = params, headers = headers, auth=auth)
 		HttpClient.__validate_response(response)
 		return json.loads(response.text)
 
@@ -67,4 +67,4 @@ class HttpClient:
 			
 				raise HttpError({"status_code": response.status_code, "reason": response.reason, "error": error})
 
-				  
+			
