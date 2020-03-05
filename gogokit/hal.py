@@ -56,13 +56,13 @@ class HalClient:
 		return factory(HttpClient.get(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params))
 
 	def post(self, url, data,  factory, params = None):
-		return factory(HttpClient.post(url, data, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params))
+		return factory(HttpClient.post(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), json_data=data, params= params))
 
 	def patch(self, url, data,  factory, params = None):
-		return factory(HttpClient.patch(url, data, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params))
+		return factory(HttpClient.patch(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), json_data=data, params= params))
 
 	def put(self, url, data, factory, params = None):
-		return factory(HttpClient.put(url, data, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params))
+		return factory(HttpClient.put(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), json_data=data,  params= params))
 
 	def delete(self, url, factory, params = None):
 		HttpClient.delete(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params)
