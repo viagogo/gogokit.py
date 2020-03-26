@@ -88,7 +88,7 @@ class HalClient:
 	def get_paged_resource(self, url, factory, params = None):
 		return PagedResource(HttpClient.get(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params), factory)
 
-	def get_changed_resource(self, url, factory, params = None):
+	def get_changed_resources(self, url, factory, params = None):
 		return ChangedResource(HttpClient.get(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params), factory)
 
 	def get_file(self, url, params = None):

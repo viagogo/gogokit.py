@@ -40,7 +40,7 @@ class BaseClient(object):
 	def get_resources(self, path, id, params = None):
 		url = self.__get_url(path, id)
 		
-		return self.hal.get_paged_resource(url, self.__factory, params)
+		return self.hal.get_paged_resources(url, self.__factory, params)
 	
 	def post_file(self, path, id, file_name, file, params = None):
 		url = self.__get_url(path, id)
@@ -57,7 +57,7 @@ class BaseClient(object):
 		hasNextPage = True
 
 		while hasNextPage:
-			page = self.hal.get_paged_resource(url, self.__factory, params)
+			page = self.hal.get_paged_resources(url, self.__factory, params)
 
 			if page.items:
 				for item in page.items:
@@ -72,7 +72,7 @@ class BaseClient(object):
 
 		return result
 
-	def get_changed_resource(self, path, params = None):
+	def get_changed_resources(self, path, params = None):
 		params = {} if params is None else params
 		params['page'] = 1
 		params['page_size'] = 10000
@@ -87,7 +87,7 @@ class BaseClient(object):
 		hasNextPage = True
 
 		while hasNextPage:
-			page = self.hal.get_changed_resource(url, self.__factory, params)
+			page = self.hal.get_changed_resources(url, self.__factory, params)
 
 			if page.items:
 				for item in page.items:
@@ -124,7 +124,7 @@ class SellerListingClient(BaseClient):
 		return self.get_resources(self.PATH, None, params)
 
 	def get_changed_listings(self, nextLink, params = None):
-		return self.get_changed_resource(nextLink or "sellerlistings?sort=resource_version", params)
+		return self.get_changed_resources(nextLink or "sellerlistings?sort=resource_version", params)
 
 	def update_listing(self, listingId, data, params = None):
 		return self.update(self.PATH, listingId, data, params)
