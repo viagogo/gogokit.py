@@ -28,6 +28,24 @@ class PagedResource(Resource):
 		self.page = data["page"]
 		self.page_size = data["page_size"]
 
+
+class ChangedResource(Resource):
+	def __init__(self, data, factory):
+		super(ChangedResource, self).__init__(data)
+		self.items = []
+		self.deleted_items = []
+		
+		for item in data["_embedded"]["items"]:
+			self.items.append(factory(item))
+
+		if "deleted_items" in data["_embedded"]:
+			for item in data["_embedded"]["deleted_items"]:
+				self.deleted_items.append(factory(item))
+
+		self.total_items = data["total_items"]
+		self.page = data["page"]
+		self.page_size = data["page_size"]
+
 class Root(Resource):
 	def __init__(self, data):
 		super(Root, self).__init__(data)
@@ -69,6 +87,9 @@ class HalClient:
 
 	def get_paged_resource(self, url, factory, params = None):
 		return PagedResource(HttpClient.get(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params), factory)
+
+	def get_changed_resource(self, url, factory, params = None):
+		return ChangedResource(HttpClient.get(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params), factory)
 
 	def get_file(self, url, params = None):
 		return HttpClient.get_file(url, auth=HTTPBearerAuth(self.token_store.get_access_token()), params= params)

@@ -72,6 +72,41 @@ class BaseClient(object):
 
 		return result
 
+	def get_changed_resource(self, path, params = None):
+		params = {} if params is None else params
+		params['page'] = 1
+		params['page_size'] = 10000
+
+		if path.startswith('https'):
+			url = path
+		else:
+			url = self.__get_url(path, id)
+
+		result = []
+		deleted_items =[]
+		hasNextPage = True
+
+		while hasNextPage:
+			page = self.hal.get_changed_resource(url, self.__factory, params)
+
+			if page.items:
+				for item in page.items:
+					result.append(item)
+			
+			if page.deleted_items:
+				for item in page.deleted_items:
+					deleted_items.append(item)
+
+			if not "next" in page.links:
+				hasNextPage = False
+			else:
+				url = page.links["next"].href
+
+		page.items = result
+		page.deleted_items = deleted_items
+
+		return page
+
 class SellerListingClient(BaseClient):
 	PATH = 'sellerlistings{/id}'
 	EXTERNALPATH = 'externalsellerlistings{/id}'
@@ -87,6 +122,9 @@ class SellerListingClient(BaseClient):
 
 	def get_all_listings(self, params = None):
 		return self.get_resources(self.PATH, None, params)
+
+	def get_changed_listings(self, nextLink, params = None):
+		return self.get_changed_resource(nextLink or "sellerlistings?sort=resource_version", params)
 
 	def update_listing(self, listingId, data, params = None):
 		return self.update(self.PATH, listingId, data, params)
