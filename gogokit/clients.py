@@ -339,6 +339,9 @@ class SaleClient(BaseClient):
 	def save_eticket_ids(self, sale_id, eticket_ids, params = None):
 		return self.update(self.PATH, sale_id, {'eticket_ids': eticket_ids}, params)
 
+	def get_changed_sales(self, nextLink, params = None):
+		return self.get_changed_resources(nextLink or "sales?sort=resource_version", params)
+
 class ShipmentClient(BaseClient):
 	PATH = 'sales{/id}/shipments'
 	def __init__(self, hal):
