@@ -84,8 +84,8 @@ class SellerListing(Resource):
 	def __init__(self, data):
 		super(SellerListing, self).__init__(data)
 		self.id = data.get("id", None)
-		self.created_at = iso8601.parse_date(data["created_at"])
-		self.updated_at = iso8601.parse_date(data["updated_at"])
+		self.created_at =  iso8601.parse_date(data["created_at"]) if data.get("created_at", None) is not None else None
+		self.updated_at = iso8601.parse_date(data["updated_at"]) if data.get("updated_at", None) is not None else None
 		self.external_id = data.get("external_id", None)
 		self.expires_at = iso8601.parse_date(data["expires_at"]) if data.get("expires_at", None) is not None else None
 		self.in_hand_at = iso8601.parse_date(data["in_hand_at"]) if data.get("in_hand_at", None) is not None else None
